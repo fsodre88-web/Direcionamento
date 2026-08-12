@@ -33,30 +33,33 @@
 </head>
 <body>
     <div class="spinner"></div>
-    <p>Redirecionando, aguarde...</p>
+    <p id="status">Abrindo em uma nova aba...</p>
     <p id="fallback" style="display:none; margin-top: 20px;">
-        Não foi redirecionado automaticamente? <a id="fallback-link" href="#">Clique aqui</a>.
+        Não abriu automaticamente? <a id="fallback-link" href="#" target="_blank" rel="noopener noreferrer">Clique aqui</a>.
     </p>
 
     <script>
-        // Lê o parâmetro ?to= da URL, ex: redirect.html?to=https://www.instagram.com/algo
+        // Lê o parâmetro ?to= da URL, ex: ?to=https://www.instagram.com/algo
         const params = new URLSearchParams(window.location.search);
         const destino = params.get('to');
 
         if (destino) {
             document.getElementById('fallback-link').href = destino;
-            // Pequeno delay para garantir que esta página já "existe" como
-            // navegação independente antes de redirecionar de novo.
-            setTimeout(function () {
-                window.location.replace(destino);
-            }, 150);
 
-            // Se em 3s ainda estiver aqui, mostra o link manual
+            // Pequeno delay para garantir que esta página já "existe" como
+            // navegação independente antes de abrir o destino.
             setTimeout(function () {
-                document.getElementById('fallback').style.display = 'block';
-            }, 3000);
+                const novaAba = window.open(destino, '_blank', 'noopener,noreferrer');
+                if (novaAba) {
+                    document.getElementById('status').textContent = 'Pronto! Você já pode fechar esta aba.';
+                } else {
+                    // Pop-up bloqueado pelo navegador: mostra o link manual
+                    document.getElementById('status').textContent = 'Não foi possível abrir automaticamente.';
+                    document.getElementById('fallback').style.display = 'block';
+                }
+            }, 150);
         } else {
-            document.querySelector('p').textContent = 'Nenhum destino informado.';
+            document.getElementById('status').textContent = 'Nenhum destino informado.';
         }
     </script>
 </body>
